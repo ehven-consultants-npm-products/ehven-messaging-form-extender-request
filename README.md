@@ -1,6 +1,12 @@
 # Messaging Form Extender: Request
 
-Development candidate `0.1.0-dev.0`; not published. MIT licensed. Adds declarative request reasons, conditional field validation and plain-text request formatting to `@ehven/messaging-form-core`. No course catalog, roster, Astro renderer or provider transport is imported.
+MIT licensed. Adds declarative request reasons, conditional field validation and plain-text request formatting to `@ehven/messaging-form-core`. No course catalog, roster, Astro renderer or provider transport is imported.
+
+## Install
+
+```sh
+npm install @ehven/messaging-form-core @ehven/messaging-form-extender-request
+```
 
 ## Request schema
 
@@ -42,8 +48,12 @@ Core owns method/media/body limits, honeypot handling, verification and delivery
 
 Render the reason selector and conditional inputs in your host adapter. Disable inactive controls and make only active required fields required; validate again on the server. Full browser conditional-field integration remains adapter acceptance work. A request never grants enrollment or other access. The host owns resource identifiers, permissions, privacy disclosures, credentials, provider mapping, retention and delivery policy. No raw message or token logging is supplied.
 
-## Installation and compatibility
+## Compatibility and removal
 
-The core peer requirement is `@ehven/messaging-form-core@^0.1.0-dev.0`. Tests exercise the existing preset plus an independent estimate/callback fixture against an installed core tarball. A fresh offline installed-package test is part of the coordinated family verification; it is not evidence of a second live site. Neither package is published yet. There are no install hooks or additional runtime dependencies. Node 24 verification does not establish browser, WordPress PHP, real Worker or provider compatibility.
+Requires Node.js 24 or later and Messaging Form Core ^0.1.0. TypeScript declarations are included. Renderer, authorization and live provider behavior depend on the host application.
 
-Uninstall by removing schema/handler composition and then the package. Remote submissions or access grants managed by the host remain subject to its own recovery/deletion policy. Public support/security routes will be defined before release; no service SLA is promised for this candidate.
+Remove imports and application composition before uninstalling. Previously accepted provider submissions remain subject to the host’s retention policy.
+
+## Support
+
+Patch releases within 0.1 are intended to be compatible. Future 0.x minor releases may change APIs. Open an issue for bugs and usage questions. For a security concern, use the contact form to request a private reporting channel and keep credentials, tokens and submissions out of the public tracker. [Issues](https://github.com/ehven-consultants-npm-products/ehven-messaging-form-extender-request/issues) · [Contact](https://ehven.com/contact/)
