@@ -1,0 +1,69 @@
+name: Release
+on:
+  workflow_dispatch:
+    inputs:
+      source_revision:
+        description: Reviewed product main commit SHA
+        type: string
+        required: true
+      candidate_integrity:
+        description: Reviewed npm tarball integrity (sha512-...)
+        type: string
+        required: true
+      submit_stage:
+        description: Submit the verified candidate to npm staging after preparing its draft
+        type: boolean
+        required: true
+        default: false
+permissions:
+  contents: read
+concurrency:
+  group: release
+  cancel-in-progress: false
+jobs:
+  prepare:
+    name: Prepare verified release candidate
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: write
+      actions: read
+      id-token: write
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          persist-credentials: false
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          repository: ehven-consultants-npm-products/ehven-messaging-form-core
+          ref: ae085d58903b2b2bfd4539ffce1171874a338d1a
+          path: .release-core
+          persist-credentials: false
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1
+        with:
+          node-version-file: .nvmrc
+          package-manager-cache: false
+      - name: Select npm
+        run: |
+          curl --fail --silent --show-error --max-time 30 --max-filesize 8388608 https://registry.npmjs.org/npm/-/npm-12.2.2.tgz -o "$RUNNER_TEMP/npm.tgz"
+          node --input-type=module -e 'import{readFileSync}from"node:fs";import{createHash}from"node:crypto";if(createHash("sha512").update(readFileSync(process.env.RUNNER_TEMP+"/npm.tgz")).digest("base64")!=="KglgbZyacf7jH+FHuNRqVuCzQi8VhI2a7J87Ix43FsPTuZoGWmIXXGdZtBUOA79vwL+IJREqURVzupA7PsQTcA==")process.exit(1)'
+          mkdir "$RUNNER_TEMP/release-npm"
+          tar -xzf "$RUNNER_TEMP/npm.tgz" --no-same-owner --no-same-permissions -C "$RUNNER_TEMP/release-npm"
+          mkdir "$RUNNER_TEMP/release-npm/bin"
+          ln -s "$RUNNER_TEMP/release-npm/package/bin/npm-cli.js" "$RUNNER_TEMP/release-npm/bin/npm"
+          echo "$RUNNER_TEMP/release-npm/bin" >> "$GITHUB_PATH"
+      - run: node .release-core/scripts/release.mjs prepare
+      - name: Prepare draft assets
+        env:
+          GH_TOKEN: ${{ github.token }}
+          EXPECTED_SOURCE: ${{ inputs.source_revision }}
+          EXPECTED_INTEGRITY: ${{ inputs.candidate_integrity }}
+        run: node .release-core/scripts/release.mjs draft
+      - name: Submit npm stage
+        if: ${{ inputs.submit_stage }}
+        env:
+          GH_TOKEN: ${{ github.token }}
+          EXPECTED_SOURCE: ${{ inputs.source_revision }}
+          EXPECTED_INTEGRITY: ${{ inputs.candidate_integrity }}
+        run: node .release-core/scripts/release.mjs stage >> "$GITHUB_STEP_SUMMARY"

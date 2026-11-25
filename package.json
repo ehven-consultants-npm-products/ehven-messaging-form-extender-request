@@ -1,7 +1,6 @@
 {
   "name": "@ehven/messaging-form-extender-request",
-  "version": "0.1.0-dev.1",
-  "private": true,
+  "version": "0.1.0",
   "license": "MIT",
   "type": "module",
   "description": "Declarative request reasons, conditional field validation and message formatting over Messaging Form Core.",
@@ -10,15 +9,17 @@
     "./server": "./src/server.mjs"
   },
   "files": [
-    "src",
-    "README.md"
+    "src/index.d.mts",
+    "src/index.mjs",
+    "src/server.d.mts",
+    "src/server.mjs"
   ],
   "sideEffects": false,
   "engines": {
     "node": ">=24"
   },
   "peerDependencies": {
-    "@ehven/messaging-form-core": "^0.1.0-dev.0"
+    "@ehven/messaging-form-core": "^0.1.0"
   },
   "scripts": {
     "check": "node --test test/*.test.mjs",
@@ -27,5 +28,12 @@
   "repository": {
     "type": "git",
     "url": "git+https://github.com/ehven-consultants-npm-products/ehven-messaging-form-extender-request.git"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "homepage": "https://github.com/ehven-consultants-npm-products/ehven-messaging-form-extender-request#readme",
+  "bugs": {
+    "url": "https://github.com/ehven-consultants-npm-products/ehven-messaging-form-extender-request/issues"
   }
 }

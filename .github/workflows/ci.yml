@@ -1,0 +1,31 @@
+name: Product checks
+on:
+  push:
+    branches: [main]
+  pull_request:
+permissions:
+  contents: read
+jobs:
+  verify:
+    name: Required checks
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          persist-credentials: false
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          repository: ehven-consultants-npm-products/ehven-messaging-form-core
+          ref: ae085d58903b2b2bfd4539ffce1171874a338d1a
+          path: .release-core
+          persist-credentials: false
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020
+        with:
+          node-version-file: .nvmrc
+          package-manager-cache: false
+      - name: Install the pinned core candidate
+        run: |
+          npm pack ./.release-core --ignore-scripts --offline --pack-destination "$RUNNER_TEMP"
+          npm install --no-save --package-lock=false --ignore-scripts --offline --no-audit --no-fund "$RUNNER_TEMP/ehven-messaging-form-core-0.1.0.tgz"
+      - run: npm run check
+      - run: node .release-core/scripts/release.mjs prepare
